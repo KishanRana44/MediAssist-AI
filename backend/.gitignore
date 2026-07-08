@@ -1,0 +1,23 @@
+# Node
+node_modules/
+
+# Python
+venv/
+backend/ai/venv/
+__pycache__/
+*.pyc
+
+# Environment
+.env
+
+# Uploads
+uploads/
+
+# Build
+dist/
+build/
+
+node_modules
+.env
+.postman
+postman
