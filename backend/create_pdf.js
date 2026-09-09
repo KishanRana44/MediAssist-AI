@@ -1,0 +1,264 @@
+const fs = require("fs");
+const path = require("path");
+const PDFDocument = require("pdfkit");
+
+// Create knowledge_base folder if missing
+const outputDir = path.join(
+  __dirname,
+  "knowledge_base"
+);
+
+if (!fs.existsSync(outputDir)) {
+  fs.mkdirSync(outputDir, {
+    recursive: true,
+  });
+}
+
+const outputPath = path.join(
+  outputDir,
+  "cardiac_clinical_guidelines.pdf"
+);
+
+const doc = new PDFDocument({
+  margin: 50,
+});
+
+console.log(
+  "⏳ Generating medical knowledge base PDF..."
+);
+
+const stream = fs.createWriteStream(
+  outputPath
+);
+
+doc.pipe(stream);
+
+/* ==================================
+   TITLE
+================================== */
+
+doc
+  .fontSize(24)
+  .fillColor("#1e3a8a")
+  .text(
+    "MediAssist AI: Clinical Decision Core",
+    {
+      align: "center",
+    }
+  );
+
+doc.moveDown(1);
+
+/* ==================================
+   SECTION 1
+================================== */
+
+doc
+  .fontSize(18)
+  .fillColor("#0f172a")
+  .text(
+    "Section 1: Electrophysiology & Arrhythmia Classification"
+  );
+
+doc.moveDown(0.5);
+
+doc
+  .fontSize(11)
+  .fillColor("#334155")
+  .text(
+    `Atrial Fibrillation (AFib) is characterized by an irregularly irregular ventricular rhythm due to rapid, disorganized atrial activation.
+
+On a standard 12-lead ECG, structural indicators include the complete absence of distinct organized P-waves.
+
+Instead, fibrillatory waves (f-waves) are visible with varying amplitudes and morphology.
+
+R-R intervals demonstrate significant variability.
+
+The ventricular rate typically ranges between 100 and 160 beats per minute in untreated patients.
+
+Clinical evaluation should include electrolyte assessment, metabolic panels and echocardiographic screening.`,
+    {
+      lineGap: 4,
+      align: "justify",
+    }
+  );
+
+doc.moveDown(1.5);
+
+/* ==================================
+   SECTION 2
+================================== */
+
+doc
+  .fontSize(18)
+  .fillColor("#0f172a")
+  .text(
+    "Section 2: Premature Ventricular Contractions (PVC)"
+  );
+
+doc.moveDown(0.5);
+
+doc
+  .fontSize(11)
+  .fillColor("#334155")
+  .text(
+    `Premature Ventricular Contractions (PVCs) represent ectopic impulses originating from ventricular myocardium.
+
+Morphological evaluation reveals wide QRS complexes usually exceeding 120 milliseconds.
+
+PVCs are generally not preceded by a normal P-wave.
+
+Secondary ST-segment changes and T-wave inversion are commonly observed.
+
+A compensatory pause usually follows the PVC before sinus rhythm resumes.
+
+Frequent PVCs may be associated with ischemic heart disease, electrolyte imbalance, stress, fatigue, cardiomyopathy or structural cardiac abnormalities.`,
+    {
+      lineGap: 4,
+      align: "justify",
+    }
+  );
+
+doc.moveDown(1.5);
+
+/* ==================================
+   SECTION 3
+================================== */
+
+doc
+  .fontSize(18)
+  .fillColor("#0f172a")
+  .text(
+    "Section 3: Heart Failure"
+  );
+
+doc.moveDown(0.5);
+
+doc
+  .fontSize(11)
+  .fillColor("#334155")
+  .text(
+    `Heart failure is a clinical syndrome resulting from structural or functional impairment of ventricular filling or ejection of blood.
+
+Common symptoms include:
+
+• Shortness of breath
+
+• Fatigue
+
+• Reduced exercise tolerance
+
+• Peripheral edema
+
+• Orthopnea
+
+• Weight gain due to fluid retention
+
+Diagnosis may involve ECG analysis, echocardiography, BNP levels and chest imaging.`,
+    {
+      lineGap: 4,
+    }
+  );
+
+doc.moveDown(1.5);
+
+/* ==================================
+   SECTION 4
+================================== */
+
+doc
+  .fontSize(18)
+  .fillColor("#0f172a")
+  .text(
+    "Section 4: Hypertension"
+  );
+
+doc.moveDown(0.5);
+
+doc
+  .fontSize(11)
+  .fillColor("#334155")
+  .text(
+    `Hypertension is defined as persistently elevated arterial blood pressure.
+
+Risk factors include:
+
+• Obesity
+
+• Smoking
+
+• Diabetes
+
+• Sedentary lifestyle
+
+• High sodium intake
+
+Long-term uncontrolled hypertension increases the risk of stroke, myocardial infarction, chronic kidney disease and heart failure.`,
+    {
+      lineGap: 4,
+    }
+  );
+
+doc.moveDown(1.5);
+
+/* ==================================
+   GUARDRAILS
+================================== */
+
+doc
+  .fontSize(14)
+  .fillColor("#b91c1c")
+  .text(
+    "Clinical Note / AI Guardrails"
+  );
+
+doc.moveDown(0.5);
+
+doc
+  .fontSize(10)
+  .fillColor("#475569")
+  .text(
+    `Any telemetry signal indicating sustained ventricular tachycardia, multifocal PVCs, ventricular fibrillation, persistent chaotic fibrillatory waves or severe hemodynamic instability should be categorized as high-risk or critical-risk and immediately escalated for physician review.`,
+    {
+      lineGap: 3,
+    }
+  );
+
+/* ==================================
+   FOOTER
+================================== */
+
+doc.moveDown(2);
+
+doc
+  .fontSize(10)
+  .fillColor("#64748b")
+  .text(
+    "Generated by MediAssist AI Knowledge Base Generator",
+    {
+      align: "center",
+    }
+  );
+
+doc.end();
+
+stream.on("finish", () => {
+  console.log(
+    "\n✅ SUCCESS: Medical reference document created"
+  );
+
+  console.log(
+    `📄 File Location:\n${outputPath}`
+  );
+
+  console.log(
+    "\n🚀 Now run:\nnpm run dev"
+  );
+});
+
+stream.on("error", (err) => {
+  console.error(
+    "❌ PDF Creation Failed:",
+    err
+  );
+});
