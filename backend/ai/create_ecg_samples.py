@@ -1,4 +1,5 @@
 import os
+import json
 import shutil
 import tempfile
 
@@ -7,7 +8,7 @@ import numpy as np
 
 os.environ.setdefault("TF_USE_LEGACY_KERAS", "1")
 
-from ecg_predict import CLASS_NAMES, model, predict_ecg
+from ecg_predict import CLASS_NAMES, predict_ecg
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
@@ -17,12 +18,14 @@ CLASS_FILES = {
     "R-on-T Beat": "2_r_on_t_beat.png",
     "Premature Ventricular Contraction": "3_premature_ventricular_contraction.png",
     "Supraventricular Premature Beat": "4_supraventricular_premature_beat.png",
-    "Unknown Beat": "5_unknown_beat.png",
 }
 
 
 def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
+    for existing_file in os.listdir(OUTPUT_DIR):
+        if existing_file.endswith(".png"):
+            os.remove(os.path.join(OUTPUT_DIR, existing_file))
     rows = np.vstack([
         np.loadtxt(os.path.join(DATA_DIR, "ECG5000_TRAIN.txt")),
         np.loadtxt(os.path.join(DATA_DIR, "ECG5000_TEST.txt")),
@@ -32,12 +35,12 @@ def main():
     minimum = signals.min(axis=1, keepdims=True)
     maximum = signals.max(axis=1, keepdims=True)
     signals = (signals - minimum) / np.maximum(maximum - minimum, 1e-6)
-    direct_predictions = np.argmax(model.predict(signals[..., np.newaxis], verbose=0), axis=1)
     temporary_dir = tempfile.mkdtemp(prefix="ecg_samples_")
 
+    verification = {}
     try:
         for class_index, class_name in enumerate(CLASS_NAMES):
-            candidate_indices = np.flatnonzero(direct_predictions == class_index)
+            candidate_indices = np.flatnonzero(rows[:, 0].astype(np.int32) - 1 == class_index)
             output_name = CLASS_FILES[class_name]
             verified_path = None
             for candidate_index in candidate_indices[:100]:
@@ -57,12 +60,17 @@ def main():
                     break
 
             if verified_path is None:
-                raise RuntimeError(f"Could not create a verified image for {class_name}")
+                verification[class_name] = {"verified": False, "message": "No rendered sample matched this label."}
+                continue
             shutil.copyfile(verified_path, os.path.join(OUTPUT_DIR, output_name))
+            verification[class_name] = {"verified": True, "file": output_name}
     finally:
         shutil.rmtree(temporary_dir, ignore_errors=True)
 
+    with open(os.path.join(OUTPUT_DIR, "verification.json"), "w", encoding="utf-8") as report_file:
+        json.dump(verification, report_file, indent=2)
     print(f"Created {len(CLASS_NAMES)} sample images in {OUTPUT_DIR}")
+    print(json.dumps(verification, indent=2))
 
 
 if __name__ == "__main__":

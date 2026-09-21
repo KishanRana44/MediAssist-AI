@@ -1,4 +1,4 @@
-const { exec } = require("child_process");
+const { spawn } = require("child_process");
 const path = require("path");
 
 exports.analyzeHeartSound = async (req, res) => {
@@ -21,16 +21,24 @@ exports.analyzeHeartSound = async (req, res) => {
     console.log("Python Script:", scriptPath);
     console.log("Audio File:", filePath);
 
-    exec(
-      `python "${scriptPath}" "${filePath}"`,
-      (err, stdout, stderr) => {
+    const pythonExecutable = process.env.ECG_PYTHON_PATH || process.env.PYTHON_PATH || "python";
+    const pythonProcess = spawn(pythonExecutable, [scriptPath, filePath], { windowsHide: true });
+    let stdout = "";
+    let stderr = "";
+
+    pythonProcess.stdout.on("data", (data) => { stdout += data.toString(); });
+    pythonProcess.stderr.on("data", (data) => { stderr += data.toString(); });
+    pythonProcess.on("error", (err) => {
+      return res.status(500).json({ error: err.message });
+    });
+    pythonProcess.on("close", (code) => {
 
         console.log("STDOUT:", stdout);
         console.log("STDERR:", stderr);
 
-        if (err) {
+        if (code !== 0) {
           return res.status(500).json({
-            error: err.message,
+            error: `Heart-sound model exited with code ${code}`,
             stderr
           });
         }
@@ -54,8 +62,7 @@ exports.analyzeHeartSound = async (req, res) => {
             stdout
           });
         }
-      }
-    );
+    });
 
   } catch (error) {
     console.error(error);

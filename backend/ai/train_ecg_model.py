@@ -18,14 +18,18 @@ CLASS_NAMES = {
     2: "R-on-T Beat",
     3: "Premature Ventricular Contraction",
     4: "Supraventricular Premature Beat",
-    5: "Unknown Beat",
 }
 
 
 def load_dataset():
     def read_file(filename):
         rows = np.loadtxt(os.path.join(DATA_DIR, filename))
-        labels = rows[:, 0].astype(np.int32) - 1
+        source_labels = rows[:, 0].astype(np.int32)
+        supported = np.isin(source_labels, list(CLASS_NAMES))
+        rows = rows[supported]
+        labels = rows[:, 0].astype(np.int32)
+        label_indexes = {label: index for index, label in enumerate(CLASS_NAMES)}
+        labels = np.array([label_indexes[label] for label in labels], dtype=np.int32)
         signals = rows[:, 1:].astype(np.float32)
         minimum = signals.min(axis=1, keepdims=True)
         maximum = signals.max(axis=1, keepdims=True)

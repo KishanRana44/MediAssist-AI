@@ -71,13 +71,13 @@ exports.uploadAndProcessECG = async (req, res) => {
       );
       const aiResult = JSON.parse(rawDataOutput);
 
-        if (!aiResult.success) {
+      if (!aiResult.success) {
         await fs.promises.unlink(absoluteFilePath).catch(() => {});
-          return res.status(422).json({
-            success: false,
-            message: aiResult.message || "Model engine execution returned an unsuccessful state indicator."
-          });
-        }
+        return res.status(422).json({
+          success: false,
+          message: aiResult.message || "Model engine execution returned an unsuccessful state indicator."
+        });
+      }
 
         // Clean arrays fallback handling for recommendations extraction
         const computedRecommendations = Array.isArray(aiResult.recommendations)

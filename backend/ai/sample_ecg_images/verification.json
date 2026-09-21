@@ -1,0 +1,18 @@
+{
+  "Normal Beat": {
+    "verified": true,
+    "file": "1_normal_beat.png"
+  },
+  "R-on-T Beat": {
+    "verified": true,
+    "file": "2_r_on_t_beat.png"
+  },
+  "Premature Ventricular Contraction": {
+    "verified": true,
+    "file": "3_premature_ventricular_contraction.png"
+  },
+  "Supraventricular Premature Beat": {
+    "verified": true,
+    "file": "4_supraventricular_premature_beat.png"
+  }
+}

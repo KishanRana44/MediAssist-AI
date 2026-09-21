@@ -8,6 +8,7 @@ import warnings
 # ==========================================
 # Suppress TensorFlow C++ logs (0 = all, 3 = none)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ.setdefault('TF_USE_LEGACY_KERAS', '1')
 # Suppress Python warnings (like deprecation warnings from Librosa)
 warnings.filterwarnings('ignore')
 
@@ -45,8 +46,11 @@ except Exception as e:
 
 interpretations = {
     "normal": "Heart sounds appear normal.",
-    "abnormal": "Abnormal heart sounds detected. Clinical evaluation recommended.",
-    "uncertain": "Model confidence too low for reliable diagnosis."
+    "murmur": "A murmur-like acoustic pattern was detected.",
+    "aortic_stenosis": "An aortic-stenosis-like acoustic pattern was detected.",
+    "extrasystole": "An extrasystole-like acoustic pattern was detected.",
+    "artifact": "The recording contains artifact-like acoustic patterns and may need to be repeated.",
+    "uncertain": "Model confidence is too low for reliable classification."
 }
 
 # ==========================================
@@ -100,11 +104,18 @@ except Exception:
 # ==========================================
 
 try:
-    mfcc = librosa.feature.mfcc(y=signal, sr=sr, n_mfcc=40)
-    mfcc = np.mean(mfcc.T, axis=0)
-    mfcc = np.expand_dims(mfcc, axis=0)
+    mel = librosa.feature.melspectrogram(
+        y=signal,
+        sr=sr,
+        n_mels=64,
+        n_fft=1024,
+        hop_length=512,
+    )
+    features = librosa.power_to_db(mel, ref=np.max).astype(np.float32)
+    features = (features - features.mean()) / (features.std() + 1e-6)
+    features = features[np.newaxis, ..., np.newaxis]
 
-    prediction = model.predict(mfcc, verbose=0)
+    prediction = model.predict(features, verbose=0)
     idx = np.argmax(prediction)
     
     label = encoder.inverse_transform([idx])[0]
@@ -129,7 +140,7 @@ try:
         "confidence": round(confidence, 4),
         "confidenceLevel": confidenceLevel,
         "probabilities": probabilities,
-        "interpretation": interpretations.get(label, "No interpretation available."),
+        "interpretation": interpretations.get(label, "Clinical review recommended."),
         "spectrogramFile": img_filename
     }
 

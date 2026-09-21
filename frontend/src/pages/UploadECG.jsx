@@ -57,6 +57,11 @@ export default function ECGReportAnalysis() {
         setFile(null);
         return;
       }
+      if (selectedFile.size > 10 * 1024 * 1024) {
+        setError("File too large: ECG images must be smaller than 10 MB.");
+        setFile(null);
+        return;
+      }
       setFile(selectedFile);
       setError(null);
     }
@@ -97,6 +102,8 @@ export default function ECGReportAnalysis() {
 
   const getRiskBadgeStyles = (level) => {
     switch (level?.toLowerCase()) {
+      case "unknown":
+        return "bg-rose-50 border-rose-200 text-rose-600";
       case "high":
       case "critical": 
         return "bg-rose-50 border-rose-200 text-rose-600";
@@ -182,7 +189,9 @@ export default function ECGReportAnalysis() {
 
                     <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100/60 space-y-1">
                       <span className="text-[10px] text-indigo-500 font-black uppercase tracking-wider flex items-center gap-1"><Sparkles size={12}/> AI Analytical Core Prediction</span>
-                      <p className="text-base font-black text-slate-800">{currentReport.prediction}</p>
+                      <p className={`text-base font-black ${currentReport.prediction === "error" ? "text-rose-600" : "text-slate-800"}`}>
+                        {currentReport.prediction === "error" ? "Unable to classify ECG" : currentReport.prediction}
+                      </p>
                     </div>
 
                     <div className="space-y-1.5">
