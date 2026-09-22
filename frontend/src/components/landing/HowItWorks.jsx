@@ -17,15 +17,15 @@ export default function HowItWorks() {
   return (
     <section
       id="howitworks"
-      className="py-24"
+      className="py-10 font-serif"
     >
       <div className="max-w-7xl mx-auto px-6">
 
-        <h2 className="text-center text-5xl font-bold mb-20">
+        <h2 className="text-center text-5xl font-bold mb-10">
           How It Works
         </h2>
 
-        <div className="grid md:grid-cols-3 gap-10">
+        <div className="grid md:grid-cols-3 gap-5">
 
           {steps.map((step, index) => (
             <div

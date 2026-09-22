@@ -106,7 +106,7 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <div className="bg-[#f8f9fe] min-h-screen w-full overflow-x-hidden p-4 sm:p-6 lg:p-8 text-gray-900 font-sans">
+      <div className="bg-[#f8f9fe] min-h-screen w-full overflow-x-hidden p-4 sm:p-6 lg:p-8 text-gray-900 font-serif">
         <div className="max-w-[1600px] mx-auto space-y-6 lg:space-y-8">
           
           {/* TOP PROFILE BAR*/}

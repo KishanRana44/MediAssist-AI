@@ -32,7 +32,7 @@ export default function TechStack() {
   ];
 
   return (
-    <section className="py-24 bg-violet-50">
+    <section className="py-10 bg-red-50 font-serif">
       <motion.div
         variants={fadeUp}
         initial="hidden"
@@ -44,7 +44,7 @@ export default function TechStack() {
           Technology Stack
         </h2>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-5">
           {techs.map((tech, index) => (
             <motion.div
               key={index}

@@ -11,22 +11,11 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b">
+    <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b font-serif">
       <div className="max-w-7xl mx-auto px-6">
         <div className="h-20 flex justify-between items-center">
 
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-violet-100 rounded-xl flex items-center justify-center">
-              <HeartPulse className="text-violet-600" />
-            </div>
-
-            <h1 className="font-bold text-2xl">
-              MediAssist
-              <span className="text-violet-600"> AI</span>
-            </h1>
-          </div>
-
-          <div className="hidden md:flex gap-8 text-gray-600">
+          <div className="hidden md:flex gap-8 text-black-600">
             <button onClick={() => scrollTo("home")}>Home</button>
             <button onClick={() => scrollTo("features")}>Features</button>
             <button onClick={() => scrollTo("about")}>About</button>
@@ -43,7 +32,7 @@ export default function Navbar() {
 
             <button
               onClick={() => navigate("/register")}
-              className="bg-violet-600 text-white px-5 py-2 rounded-xl"
+              className="bg-red-600 text-white px-5 py-2 rounded-xl"
             >
               Register
             </button>

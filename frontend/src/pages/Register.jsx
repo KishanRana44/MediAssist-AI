@@ -56,13 +56,16 @@ function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-blue-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 to-blue-100 flex items-center justify-center p-4 font-serif">
 
       <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8">
 
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-blue-700">
-            MediAssist AI
+          <h1 className="text-4xl font-bold text-black-700">
+            CardiacSaarthi
+            <span className="text-red-600">
+                {" "} AI
+              </span>
           </h1>
 
           <p className="text-gray-500 mt-2">
@@ -168,7 +171,7 @@ function Register() {
 
           <button
             disabled={loading}
-            className="w-full bg-green-600 hover:bg-green-700 text-white p-3 rounded-xl font-semibold transition"
+            className="w-full bg-red-600 hover:bg-green-700 text-white p-3 rounded-xl font-semibold transition"
           >
             {loading
               ? "Creating Account..."
@@ -180,8 +183,8 @@ function Register() {
         <p className="text-center mt-6 text-gray-600">
           Already have an account?{" "}
           <Link
-            to="/"
-            className="text-blue-600 font-semibold"
+            to="/Login"
+            className="text-red-600 font-semibold"
           >
             Login
           </Link>

@@ -5,7 +5,7 @@ export default function About() {
   return (
     <section
       id="about"
-      className="py-24 bg-white"
+      className="py-5 bg-grey font-serif"
     >
       <motion.div
         variants={fadeUp}
@@ -15,15 +15,18 @@ export default function About() {
         className="max-w-6xl mx-auto px-6"
       >
         <h2 className="text-center text-5xl font-bold">
-          About MediAssist AI
+          About CardiacSaarthi
+          <span className="text-red-600">
+                {" "} AI
+              </span>
         </h2>
 
-        <p className="mt-10 text-xl text-center text-gray-600 leading-relaxed">
-          MediAssist AI is a Multimodal Healthcare RAG Assistant
+        <p className="mt-5 text-xl text-center text-gray-600 leading-relaxed">
+          CardiacSaarthi is a Multimodal Healthcare RAG Assistant
           designed for intelligent cardiac disease analysis,
           ECG interpretation, heart sound classification,
           medical report understanding and evidence-based
-          clinical decision support.
+          clinical decision support
         </p>
       </motion.div>
     </section>

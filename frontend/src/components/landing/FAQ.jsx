@@ -26,10 +26,10 @@ export default function FAQ() {
   ];
 
   return (
-    <section className="py-24 bg-white">
-      <div className="max-w-4xl mx-auto px-6">
+    <section className="py-10 bg-white font-serif">
+      <div className="max-w-4xl mx-auto px-5">
 
-        <h2 className="text-center text-5xl font-bold mb-16">
+        <h2 className="text-center text-5xl font-bold mb-10">
           Frequently Asked Questions
         </h2>
 

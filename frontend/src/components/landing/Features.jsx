@@ -46,7 +46,7 @@ export default function Features() {
   return (
     <section
       id="features"
-      className="py-24 bg-gray-50"
+      className="py-10 bg-gray-50 font-serif"
     >
       <motion.div
         variants={fadeUp}
@@ -56,17 +56,13 @@ export default function Features() {
         className="max-w-7xl mx-auto px-6"
       >
 
-        <div className="text-center mb-20">
+        <div className="text-center mb-10">
           <h2 className="text-5xl font-bold">
-            Powerful Features
+            Features
           </h2>
-
-          <p className="mt-4 text-gray-500">
-            Everything needed for intelligent healthcare analysis.
-          </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-5">
 
           {features.map((feature, index) => (
             <div

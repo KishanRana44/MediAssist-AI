@@ -1,6 +1,5 @@
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero";
-import Stats from "../components/landing/Stats";
 import Features from "../components/landing/Features";
 import HowItWorks from "../components/landing/HowItWorks";
 import AIModules from "../components/landing/AIModules";
@@ -17,12 +16,12 @@ export default function LandingPage() {
       <Navbar />
       <main>
         <Hero />
-        <Stats />
+        <About />
         <Features />
         <HowItWorks />
         <AIModules />
         <Benefits />
-        <About />
+        
         <TechStack />
         <FAQ />
         <Contact />

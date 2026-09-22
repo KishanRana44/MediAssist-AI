@@ -26,14 +26,14 @@ export default function AIModules() {
   ];
 
   return (
-    <section className="py-24 bg-violet-50">
+    <section className="py-10 bg-red-50 font-serif">
       <div className="max-w-7xl mx-auto px-6">
 
-        <h2 className="text-center text-5xl font-bold mb-16">
+        <h2 className="text-center text-5xl font-bold mb-10">
           AI Modules
         </h2>
 
-        <div className="grid md:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-4 gap-5">
 
           {modules.map((module, index) => (
             <div

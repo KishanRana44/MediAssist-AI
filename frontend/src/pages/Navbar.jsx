@@ -13,7 +13,7 @@ export default function Navbar() {
   };
 
   return (
-    <div className="bg-white border-b border-gray-200 px-8 py-4 flex justify-between">
+    <div className="bg-white border-b border-gray-200 px-8 py-4 flex justify-between font-serif">
       <div>
         <h2 className="text-xl font-semibold">
           Dashboard

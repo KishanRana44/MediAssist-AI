@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
 import { fadeUp } from "../../utils/animations";
+import dashboardImg from './heart_demo.jpg'; 
 
 export default function Benefits() {
   return (
-    <section className="py-24">
+    <section className="py-10 font-serif">
       <motion.div
         variants={fadeUp}
         initial="hidden"
@@ -16,7 +17,10 @@ export default function Benefits() {
 
           <div>
             <h2 className="text-5xl font-bold">
-              Why Choose MediAssist AI?
+              Why Choose CardiacSaarthi
+              <span className="text-red-600">
+                {" "} AI
+              </span> ?
             </h2>
 
             <ul className="space-y-5 mt-10 text-lg">
@@ -28,7 +32,12 @@ export default function Benefits() {
             </ul>
           </div>
 
-          <div className="bg-gradient-to-br from-violet-500 to-blue-500 rounded-3xl h-[400px]">
+          <div className="bg-gradient-to-br from-violet-500 to-blue-500 rounded-3xl h-[400px] overflow-hidden">
+            <img 
+              src={dashboardImg} 
+              alt="Dashboard Preview" 
+              className="w-full h-full object-cover" 
+            />
           </div>
 
         </div>

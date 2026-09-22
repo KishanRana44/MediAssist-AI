@@ -50,17 +50,16 @@ function Login() {
 
   return (
     
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-red-100 flex items-center justify-center p-4 font-serif">
       <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8">
 
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-blue-700">
-            MediAssist AI
+          <h1 className="text-4xl font-bold text-black-600">
+            CardiacSaarthi
+            <span className="text-red-600">
+                {" "} AI
+              </span>
           </h1>
-
-          <p className="text-gray-500 mt-2">
-            Intelligent Healthcare Assistant
-          </p>
         </div>
 
         {error && (
@@ -119,18 +118,18 @@ function Login() {
 
           <button
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-xl font-semibold transition"
+            className="w-full bg-red-600 hover:bg-green-700 text-white p-3 rounded-xl font-semibold transition"
           >
             {loading ? "Logging In..." : "Login"}
           </button>
 
         </form>
 
-        <p className="text-center mt-6 text-gray-600">
+        <p className="text-center mt-6 text-grey-600">
           Don't have an account?{" "}
           <Link
             to="/register"
-            className="text-blue-600 font-semibold"
+            className="text-red-600 font-semibold"
           >
             Register
           </Link>
