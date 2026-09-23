@@ -2,10 +2,6 @@ const mongoose = require("mongoose");
 
 const medicalReportSchema = new mongoose.Schema(
   {
-    // ==========================================
-    // PATIENT INFORMATION
-    // ==========================================
-
     patientId: {
       type: String,
       required: true,

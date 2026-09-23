@@ -17,7 +17,6 @@ import DashboardLayout from "../components/DashboardLayout";
 import API from "../services/api";
 
 export default function Dashboard() {
-  // Database States setup - Completely Dynamic Layout Mappings
   const [stats, setStats] = useState({
     user: {
       name: "Loading...",
@@ -32,10 +31,10 @@ export default function Dashboard() {
     imageCount: 0,
     riskLevel: "Low",
     heartHealthScore: 100,
-    recentAnalyses: [], // Array mapping dynamic logs from collections
-    aiDirectives: []    // Array mapping system AI recommendations 
+    recentAnalyses: [],
+    aiDirectives: []
   });
-  
+
   const [isLoading, setIsLoading] = useState(true);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
@@ -54,9 +53,7 @@ export default function Dashboard() {
   const fetchStats = async () => {
     try {
       setIsLoading(true);
-      // Fetches calculations computed from USERS, PATIENTS, ECG_RECORDS, etc.
       const res = await API.get("/dashboard/stats");
-      console.log("Dashboard Data:", res.data);
       if (res.data) {
         setStats((prev) => ({
           ...prev,
@@ -70,35 +67,43 @@ export default function Dashboard() {
     }
   };
 
-  // Helper utility for setting dynamic CSS styling matching system analysis flags
   const getRiskColor = (risk) => {
     switch (risk?.toLowerCase()) {
-      case "high": return "text-rose-500 border-rose-100 bg-rose-50";
-      case "moderate": return "text-amber-500 border-amber-100 bg-amber-50";
-      default: return "text-emerald-500 border-emerald-100 bg-emerald-50";
+      case "high":
+        return "text-red-700 border-red-200 bg-red-50";
+      case "moderate":
+        return "text-amber-700 border-amber-200 bg-amber-50";
+      default:
+        return "text-emerald-700 border-emerald-200 bg-emerald-50";
     }
   };
 
   const getLogIcon = (type) => {
     switch (type?.toLowerCase()) {
-      case "ecg rhythm": return <Activity size={14} className="text-emerald-500" />;
-      case "heart sound": return <Heart size={14} className="text-rose-500" />;
-      default: return <FileText size={14} className="text-blue-500" />;
+      case "ecg rhythm":
+        return <Activity size={14} className="text-red-600" />;
+      case "heart sound":
+        return <HeartPulse size={14} className="text-rose-600" />;
+      default:
+        return <FileText size={14} className="text-rose-500" />;
     }
   };
 
   const getDirectiveIcon = (iconName) => {
     switch (iconName?.toLowerCase()) {
-      case "cardio": return <Dumbbell size={16} className="text-blue-600" />;
-      case "vitals": return <Heart size={16} className="text-rose-500" />;
-      case "hydration": return <Droplet size={16} className="text-sky-500" />;
-      default: return <Calendar size={16} className="text-amber-500" />;
+      case "cardio":
+        return <Dumbbell size={16} className="text-rose-600" />;
+      case "vitals":
+        return <Heart size={16} className="text-red-600" />;
+      case "hydration":
+        return <Droplet size={16} className="text-rose-500" />;
+      default:
+        return <Calendar size={16} className="text-amber-600" />;
     }
   };
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-
     if (hour < 12) return "Good Morning";
     if (hour < 17) return "Good Afternoon";
     return "Good Evening";
@@ -106,69 +111,79 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <div className="bg-[#f8f9fe] min-h-screen w-full overflow-x-hidden p-4 sm:p-6 lg:p-8 text-gray-900 font-serif">
+      <div className="bg-gradient-to-br from-[#fff7f7] via-[#fffbfb] to-[#fff1f2] min-h-screen w-full overflow-x-hidden p-4 sm:p-6 lg:p-8 text-rose-950 font-serif">
         <div className="max-w-[1600px] mx-auto space-y-6 lg:space-y-8">
           
-          {/* TOP PROFILE BAR*/}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-100 pb-6 sm:pb-0 sm:border-none">
+          {/* TOP PROFILE BAR */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-rose-100/80 pb-6 sm:pb-0 sm:border-none">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900 flex items-center gap-2 flex-wrap">
-                {getGreeting()}, {stats?.user?.name?.split(" ")[0] || "User"}! <span className="animate-bounce inline-block"></span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100/70 border border-rose-200/60 text-rose-700 text-xs font-semibold mb-2">
+                <HeartPulse size={13} className="text-red-600 animate-pulse" />
+                <span>Cardiac Monitoring Portal</span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-rose-950 flex items-center gap-2 flex-wrap">
+                {getGreeting()}, {stats?.user?.name?.split(" ")[0] || "User"}!
               </h1>
             </div>
-            
-            {}
-            {/* Action Group with Adaptive Alignment */}
+
+            {/* Profile Menu */}
             <div className="relative flex items-center w-full sm:w-auto justify-end">
               <button
                 onClick={(e) => {
-                    e.stopPropagation();
-                    setShowProfileMenu(!showProfileMenu);
+                  e.stopPropagation();
+                  setShowProfileMenu(!showProfileMenu);
                 }}
-                className="flex items-center gap-2.5 bg-white pl-2.5 pr-4 py-1.5 rounded-full shadow-sm border border-gray-100 hover:shadow-md transition-all shrink-0"
+                className="flex items-center gap-2.5 bg-white/90 backdrop-blur-sm pl-2.5 pr-4 py-1.5 rounded-full shadow-xs border border-rose-100 hover:border-rose-200 hover:shadow-md transition-all shrink-0"
               >
-                <div className="w-8 h-8 bg-gradient-to-tr from-indigo-500 to-violet-500 rounded-full flex items-center justify-center font-bold text-white text-xs uppercase">
-                {stats?.user?.name
-                  ?.split(" ")
-                  .map((word) => word[0])
-                  .slice(0, 2)
-                  .join("")
-                  .toUpperCase() || "US"}
+                <div className="w-8 h-8 bg-gradient-to-tr from-red-600 to-rose-500 rounded-full flex items-center justify-center font-bold text-white text-xs uppercase shadow-xs">
+                  {stats?.user?.name
+                    ?.split(" ")
+                    .map((word) => word[0])
+                    .slice(0, 2)
+                    .join("")
+                    .toUpperCase() || "US"}
                 </div>
 
                 <div className="text-left hidden md:block">
-                  <p className="text-xs font-bold text-gray-800 leading-none">
+                  <p className="text-xs font-bold text-rose-950 leading-none">
                     {stats?.user?.name || "Unknown User"}
                   </p>
-
-                  <p className="text-[10px] text-gray-400 font-semibold mt-1">
+                  <p className="text-[10px] text-rose-400 font-semibold mt-1">
                     Patient ID: {stats?.user?.patientId || "N/A"}
                   </p>
                 </div>
 
-                <ChevronDown size={14} className={`text-gray-400 hidden md:block transition-transform ${showProfileMenu ? "rotate-180" : ""}`} />
+                <ChevronDown
+                  size={14}
+                  className={`text-rose-400 hidden md:block transition-transform ${
+                    showProfileMenu ? "rotate-180" : ""
+                  }`}
+                />
               </button>
 
               {showProfileMenu && (
-                <div className="absolute right-0 top-14 w-[250px] h-[170px] bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden z-50">
-              
-                  {/* Details */}
-                  <div className="p-5 space-y-4 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Patient ID</span>
-                      <span className="font-semibold">{stats?.user?.patientId || "N/A"}</span>
+                <div className="absolute right-0 top-14 w-[250px] bg-white rounded-2xl shadow-xl border border-rose-100 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="p-4 bg-rose-50/60 border-b border-rose-100">
+                    <p className="text-xs font-bold text-rose-900">Patient Record Card</p>
+                  </div>
+                  <div className="p-4 space-y-3 text-xs">
+                    <div className="flex justify-between items-center">
+                      <span className="text-rose-400 font-medium">Patient ID</span>
+                      <span className="font-bold text-rose-900">{stats?.user?.patientId || "N/A"}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Age</span>
-                      <span className="font-semibold">{stats?.user?.age || "--"}</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-rose-400 font-medium">Age</span>
+                      <span className="font-bold text-rose-900">{stats?.user?.age || "--"}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Gender</span>
-                      <span className="font-semibold">{stats?.user?.gender || "--"}</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-rose-400 font-medium">Gender</span>
+                      <span className="font-bold text-rose-900">{stats?.user?.gender || "--"}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Blood Group</span>
-                      <span className="font-semibold">{stats?.user?.bloodGroup || "--"}</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-rose-400 font-medium">Blood Group</span>
+                      <span className="font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-md border border-red-100">
+                        {stats?.user?.bloodGroup || "--"}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -176,165 +191,206 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {}
-          {/* METRICS / KPI GRID - Dynamic Column Calculation */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            
-            {/* Card 1: Dynamic Aggregated Heart Health Score */}
-            <div className="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-gray-100 flex flex-col justify-between min-h-[160px] relative overflow-hidden hover:shadow-md transition-all">
-              <div className="flex justify-between items-start relative z-10">
-                <div>
-                  <p className="text-xs sm:text-sm font-bold text-gray-400 tracking-wide uppercase">Heart Health Score</p>
-                  <div className="flex items-baseline gap-1 mt-3">
-                    <span className="text-4xl sm:text-5xl font-black text-indigo-600 tracking-tight">
-                      {stats.heartHealthScore}
-                    </span>
-                    <span className="text-gray-400 font-bold text-base">/ 100</span>
-                  </div>
-                  <p className={`font-black text-xs sm:text-sm mt-1.5 flex items-center gap-1 ${stats.heartHealthScore >= 75 ? 'text-emerald-500' : 'text-amber-500'}`}>
-                    <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${stats.heartHealthScore >= 75 ? 'bg-emerald-500' : 'bg-amber-500'}`}></span>
-                    {stats.heartHealthScore >= 75 ? "Optimal State" : "Review Needed"}
+          {/* METRICS / KPI GRID */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+
+            {/* Card 1: Heart Health Score */}
+            <div className="w-full h-[160px] bg-white/95 rounded-2xl p-5 border border-rose-100/90 shadow-xs flex flex-col justify-between relative overflow-hidden hover:shadow-md hover:border-rose-200 transition-all group">
+              <div className="relative z-10">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs sm:text-sm font-semibold text-rose-400 tracking-wide">
+                    Heart Health Score
                   </p>
+                  <span className="p-1.5 rounded-lg bg-rose-50 text-rose-600">
+                    <Heart size={15} />
+                  </span>
                 </div>
-                <div className="p-2.5 bg-indigo-50 text-indigo-500 rounded-xl">
-                  <HeartPulse size={20} />
+
+                <div className="flex items-baseline gap-1 mt-1">
+                  <span className="text-4xl font-black text-rose-600 tracking-tight">
+                    {stats.heartHealthScore}
+                  </span>
+                  <span className="text-rose-300 font-semibold text-sm">/ 100</span>
                 </div>
+
+                <p
+                  className={`font-bold text-xs mt-1.5 flex items-center gap-1.5 ${
+                    stats.heartHealthScore >= 75 ? "text-emerald-600" : "text-amber-600"
+                  }`}
+                >
+                  <span
+                    className={`w-2 h-2 rounded-full ${
+                      stats.heartHealthScore >= 75 ? "bg-emerald-500 animate-ping" : "bg-amber-500"
+                    }`}
+                  ></span>
+                  {stats.heartHealthScore >= 75 ? "Optimal Cardiac State" : "Review Recommended"}
+                </p>
               </div>
-              <div className="absolute bottom-0 left-0 right-0 h-10 w-full px-1 opacity-70 pointer-events-none">
+
+              {/* Pulse line chart */}
+              <div className="absolute bottom-0 left-0 right-0 h-10 px-1 opacity-40 pointer-events-none group-hover:opacity-70 transition-opacity">
                 <svg className="w-full h-full" viewBox="0 0 100 30" preserveAspectRatio="none">
-                  <path d="M0,25 Q15,20 30,23 T60,10 T90,18 T100,5" fill="none" stroke={stats.heartHealthScore >= 75 ? "#10b981" : "#f59e0b"} strokeWidth="2" strokeLinecap="round" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Card 2: ECG Records Count */}
-            <div className="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-gray-100 flex flex-col justify-between min-h-[160px] relative overflow-hidden hover:shadow-md transition-all">
-              <div className="flex justify-between items-start relative z-10">
-                <div>
-                  <p className="text-xs sm:text-sm font-bold text-gray-400 tracking-wide uppercase">ECG Signals</p>
-                  <h2 className="text-4xl sm:text-5xl font-black text-slate-800 mt-3 tracking-tight">
-                    {stats.ecgCount}
-                  </h2>
-                  <p className="text-gray-400 font-semibold text-xs mt-2">Active Signals Checked</p>
-                </div>
-                <div className="p-2.5 bg-emerald-50 text-emerald-500 rounded-xl">
-                  <Activity size={20} />
-                </div>
-              </div>
-              <div className="absolute bottom-1 left-0 right-0 h-8 w-full px-2 opacity-40 pointer-events-none">
-                <svg className="w-full h-full" viewBox="0 0 200 40" preserveAspectRatio="none">
-                  <path d="M0,20 L40,20 L45,10 L50,30 L55,20 L90,20 L95,5 L100,35 L105,20 L150,20 L155,15 L160,25 L165,20 L200,20" fill="none" stroke="#10b981" strokeWidth="1.5" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Card 3: Total Consolidated Structured Reports & Images */}
-            <div className="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-gray-100 flex flex-col justify-between min-h-[160px] relative overflow-hidden hover:shadow-md transition-all">
-              <div className="flex justify-between items-start relative z-10">
-                <div>
-                  <p className="text-xs sm:text-sm font-bold text-gray-400 tracking-wide uppercase">Processed Documents</p>
-                  <h2 className="text-4xl sm:text-5xl font-black text-slate-800 mt-3 tracking-tight">
-                    {stats.reportCount + stats.imageCount}
-                  </h2>
-                  <p className="text-indigo-500 font-bold text-xs mt-2">{stats.reportCount} Reports | {stats.imageCount} Med Images</p>
-                </div>
-                <div className="p-2.5 bg-violet-50 text-violet-500 rounded-xl">
-                  <FileText size={20} />
-                </div>
-              </div>
-              <div className="absolute bottom-2 right-4 h-8 flex items-end gap-1 opacity-30 pointer-events-none">
-                <div className="w-1 h-4 bg-indigo-500 rounded-full"></div>
-                <div className="w-1 h-6 bg-indigo-500 rounded-full"></div>
-                <div className="w-1 h-3 bg-indigo-500 rounded-full"></div>
-                <div className="w-1 h-7 bg-indigo-500 rounded-full"></div>
-              </div>
-            </div>
-
-            {/* Card 4: AI Context-Driven Consolidated Risk Level */}
-            <div className="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-gray-100 flex flex-col justify-between min-h-[160px] relative overflow-hidden hover:shadow-md transition-all">
-              <div className="flex justify-between items-start relative z-10">
-                <div>
-                  <p className="text-xs sm:text-sm font-bold text-gray-400 tracking-wide uppercase">AI Cross-Risk Status</p>
-                  <h2 className={`text-3xl font-black mt-4 tracking-tight ${
-                    stats.riskLevel === 'Low' ? 'text-emerald-500' : stats.riskLevel === 'Moderate' ? 'text-amber-500' : 'text-rose-500'
-                  }`}>
-                    {stats.riskLevel} Risk
-                  </h2>
-                  <p className="text-gray-400 font-semibold text-xs mt-1.5">
-                    {stats.riskLevel === 'Low' ? 'All records appear stable' : 'Requires clinical analysis review'}
-                  </p>
-                </div>
-                <div className="p-2.5 bg-teal-50 text-teal-600 rounded-xl">
-                  <ShieldCheck size={20} />
-                </div>
-              </div>
-              <div className="absolute bottom-[-12px] right-1 w-20 h-12 opacity-30 pointer-events-none">
-                <svg className="w-full h-full" viewBox="0 0 100 50">
-                  <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e2e8f0" strokeWidth="8" strokeLinecap="round" />
-                  <path 
-                    d="M 10 50 A 40 40 0 0 1 45 14" 
-                    fill="none" 
-                    stroke={stats.riskLevel === 'Low' ? '#10b981' : stats.riskLevel === 'Moderate' ? '#f59e0b' : '#ef4444'} 
-                    strokeWidth="8" 
-                    strokeLinecap="round" 
+                  <path
+                    d="M0,22 Q15,18 28,21 L35,8 L40,25 L45,15 L50,22 T75,20 T95,12 T100,20"
+                    fill="none"
+                    stroke={stats.heartHealthScore >= 75 ? "#e11d48" : "#f59e0b"}
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
                   />
                 </svg>
               </div>
             </div>
+
+            {/* Card 2: Processed Documents */}
+            <div className="w-full h-[160px] bg-white/95 rounded-2xl p-5 border border-rose-100/90 shadow-xs flex flex-col justify-between hover:shadow-md hover:border-rose-200 transition-all">
+              <div>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs sm:text-sm font-semibold text-rose-400 tracking-wide">
+                    Processed Diagnostic Logs
+                  </p>
+                  <span className="p-1.5 rounded-lg bg-red-50 text-red-600">
+                    <FileText size={15} />
+                  </span>
+                </div>
+
+                <h2 className="text-4xl font-black text-rose-950 mt-1 tracking-tight">
+                  {stats.ecgCount + stats.reportCount + stats.heartCount}
+                </h2>
+
+                <div className="flex flex-wrap items-center gap-2 mt-2 text-xs font-semibold">
+                  <span className="px-2 py-0.5 rounded-md bg-rose-50 border border-rose-100 text-rose-700">
+                    {stats.ecgCount} ECG
+                  </span>
+                  <span className="px-2 py-0.5 rounded-md bg-red-50 border border-red-100 text-red-700">
+                    {stats.reportCount} Reports
+                  </span>
+                  <span className="px-2 py-0.5 rounded-md bg-rose-100/70 border border-rose-200 text-rose-800">
+                    {stats.heartCount} PCG Sounds
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 3: AI Cross-Risk Status */}
+            <div className="w-full h-[160px] bg-white/95 rounded-2xl p-5 border border-rose-100/90 shadow-xs flex flex-col justify-between relative overflow-hidden hover:shadow-md hover:border-rose-200 transition-all">
+              <div className="relative z-10">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs sm:text-sm font-semibold text-rose-400 tracking-wide">
+                    AI Cross-Risk Assessment
+                  </p>
+                  <span className="p-1.5 rounded-lg bg-rose-50 text-rose-600">
+                    <ShieldCheck size={15} />
+                  </span>
+                </div>
+
+                <h2
+                  className={`text-2xl font-black mt-2 tracking-tight ${
+                    stats.riskLevel === "Low"
+                      ? "text-emerald-600"
+                      : stats.riskLevel === "Moderate"
+                      ? "text-amber-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  {stats.riskLevel} Risk Profile
+                </h2>
+
+                <p className="text-rose-400 font-medium text-xs mt-1">
+                  {stats.riskLevel === "Low"
+                    ? "Bio-signals stable & verified"
+                    : "Clinical rhythm review advised"}
+                </p>
+              </div>
+
+              {/* Gauge Arc */}
+              <div className="absolute bottom-[-10px] right-2 w-20 h-12 opacity-35 pointer-events-none">
+                <svg className="w-full h-full" viewBox="0 0 100 50">
+                  <path
+                    d="M 10 50 A 40 40 0 0 1 90 50"
+                    fill="none"
+                    stroke="#ffe4e6"
+                    strokeWidth="8"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M 10 50 A 40 40 0 0 1 50 10"
+                    fill="none"
+                    stroke={
+                      stats.riskLevel === "Low"
+                        ? "#10b981"
+                        : stats.riskLevel === "Moderate"
+                        ? "#f59e0b"
+                        : "#e11d48"
+                    }
+                    strokeWidth="8"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+            </div>
+
           </div>
 
-          {/* BOTTOM WORKSPACE WORKFLOW */}
+          {/* WORKSPACE WORKFLOW SECTION */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
 
-            {/* LEFT SIDE: Dynamic Analysis Logs Table from DB */}
-            <div className="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 p-4 sm:p-6 flex flex-col justify-between min-w-0">
+            {/* LEFT SIDE: Medical Metrics Table */}
+            <div className="lg:col-span-2 bg-white/95 rounded-3xl shadow-xs border border-rose-100/90 p-5 sm:p-6 flex flex-col justify-between min-w-0">
               <div>
                 <div className="flex justify-between items-center mb-5 flex-wrap gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg shrink-0">
-                      <Activity size={16} />
+                  <div className="flex items-center gap-2.5">
+                    <span className="p-2 bg-rose-50 text-red-600 rounded-xl border border-rose-100">
+                      <Activity size={18} />
                     </span>
-                    <h2 className="font-extrabold text-base sm:text-lg text-gray-800">Recent Medical Metrics</h2>
+                    <h2 className="font-extrabold text-base sm:text-lg text-rose-950">
+                      Recent Medical Analyses
+                    </h2>
                   </div>
-                  <button className="text-indigo-600 text-xs font-bold hover:text-indigo-700 transition flex items-center gap-0.5">
-                    View Logs <ChevronRight size={14} />
+                  <button className="text-rose-600 hover:text-red-700 text-xs font-bold transition flex items-center gap-0.5">
+                    Full History <ChevronRight size={14} />
                   </button>
                 </div>
 
                 <div className="w-full overflow-x-auto rounded-xl [scrollbar-width:thin]">
                   <table className="w-full text-left border-collapse min-w-[500px]">
                     <thead>
-                      <tr className="text-gray-400 text-[10px] font-bold uppercase tracking-wider border-b border-gray-100/80">
-                        <th className="pb-3 font-bold">Log Type</th>
-                        <th className="pb-3 font-bold">Diagnostics Info</th>
-                        <th className="pb-3 font-bold">Scanned Date</th>
-                        <th className="pb-3 font-bold text-right">Database Status</th>
+                      <tr className="text-rose-400 text-[10px] font-bold uppercase tracking-wider border-b border-rose-100">
+                        <th className="pb-3">Diagnosis Stream</th>
+                        <th className="pb-3">Diagnostic Details</th>
+                        <th className="pb-3">Date</th>
+                        <th className="pb-3 text-right">Result</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-50 text-xs sm:text-sm font-medium text-gray-700">
+                    <tbody className="divide-y divide-rose-50 text-xs sm:text-sm font-medium text-rose-900">
                       {stats.recentAnalyses.length === 0 ? (
                         <tr>
-                          <td colSpan="4" className="py-8 text-center text-gray-400 font-medium">
-                            No recent diagnosis data streams logged in database.
+                          <td colSpan="4" className="py-8 text-center text-rose-400 font-medium">
+                            No recent cardiac analyses logged in database.
                           </td>
                         </tr>
                       ) : (
                         stats.recentAnalyses.map((log, index) => (
-                          <tr key={log.id || index} className="hover:bg-gray-50/40 transition-colors">
+                          <tr key={log.id || index} className="hover:bg-rose-50/40 transition-colors">
                             <td className="py-3 flex items-center gap-2.5">
-                              <span className="p-2 bg-slate-50 rounded-xl shrink-0">
+                              <span className="p-2 bg-rose-50/80 rounded-xl shrink-0 border border-rose-100/60">
                                 {getLogIcon(log.type)}
                               </span>
-                              <span className="font-bold text-gray-800">{log.type}</span>
+                              <span className="font-bold text-rose-950">{log.type}</span>
                             </td>
-                            <td className="py-3 text-gray-500 font-normal">{log.info}</td>
-                            <td className="py-3 text-gray-400 font-normal text-xs">
-                              {new Date(log.date).toLocaleDateString('en-GB', {
-                                day: 'numeric', month: 'short', year: 'numeric'
+                            <td className="py-3 text-rose-700/80 font-normal">{log.info}</td>
+                            <td className="py-3 text-rose-400 font-normal text-xs">
+                              {new Date(log.date).toLocaleDateString("en-GB", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric"
                               })}
                             </td>
                             <td className="py-3 text-right">
-                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-full border ${getRiskColor(log.status)}`}>
+                              <span
+                                className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-bold rounded-full border ${getRiskColor(
+                                  log.status
+                                )}`}
+                              >
                                 {log.status}
                               </span>
                             </td>
@@ -347,58 +403,75 @@ export default function Dashboard() {
               </div>
 
               {/* Dynamic Notification Insight Indicator */}
-              <div className="mt-5 bg-indigo-50/60 border border-indigo-100 rounded-2xl p-3.5 flex items-center gap-3 text-left">
-                <span className="p-1.5 bg-white text-indigo-600 rounded-full shadow-sm shrink-0">
-                  <Sparkles size={14} />
+              <div className="mt-5 bg-gradient-to-r from-rose-50 to-red-50/60 border border-rose-100 rounded-2xl p-4 flex items-center gap-3.5 text-left">
+                <span className="p-2 bg-white text-red-600 rounded-full shadow-xs border border-rose-100 shrink-0">
+                  <Sparkles size={15} />
                 </span>
                 <div>
-                  <h4 className="text-xs font-bold text-gray-800 leading-tight">
-                    {stats.riskLevel === 'Low' ? 'All structures synced correctly from db!' : 'Attention required on anomalies!'}
+                  <h4 className="text-xs font-bold text-rose-950 leading-tight">
+                    {stats.riskLevel === "Low"
+                      ? "Cardiac biometric records synced & verified"
+                      : "Action required on cardiac biometric flags"}
                   </h4>
-                  <p className="text-[10px] text-gray-500 font-medium mt-0.5">
-                    {stats.riskLevel === 'Low' ? 'Parameters correspond to stable health logs.' : 'RAG engine indicates parameters needing system checkup.'}
+                  <p className="text-[11px] text-rose-600/80 font-medium mt-0.5">
+                    {stats.riskLevel === "Low"
+                      ? "Rhythm variance and heart sounds are within safe clinical bounds."
+                      : "AI diagnostics engine detected irregular rhythm variations requiring clinician checkup."}
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* RIGHT SIDE: Dynamic AI Recommendation Lists */}
-            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-5 sm:p-6 flex flex-col justify-between">
+            {/* RIGHT SIDE: Dynamic AI Directives */}
+            <div className="bg-white/95 rounded-3xl shadow-xs border border-rose-100/90 p-5 sm:p-6 flex flex-col justify-between">
               <div>
-                <div className="flex items-center gap-2 mb-5">
-                  <span className="p-1.5 bg-violet-50 text-violet-600 rounded-lg shrink-0">
+                <div className="flex items-center gap-2.5 mb-5">
+                  <span className="p-2 bg-red-50 text-red-600 rounded-xl border border-rose-100 shrink-0">
                     <Sparkles size={16} />
                   </span>
-                  <h2 className="font-extrabold text-base sm:text-lg text-gray-800">AI Care Directives</h2>
+                  <h2 className="font-extrabold text-base sm:text-lg text-rose-950">
+                    AI Care Directives
+                  </h2>
                 </div>
 
                 <div className="space-y-2.5">
                   {stats.aiDirectives.length === 0 ? (
-                    <div className="text-center py-6 text-xs text-gray-400 font-medium">
-                      Waiting for incoming medical data streams...
+                    <div className="text-center py-8 text-xs text-rose-400 font-medium">
+                      Waiting for active diagnosis data streams...
                     </div>
                   ) : (
                     stats.aiDirectives.map((directive, idx) => (
-                      <div key={idx} className="group border border-gray-50 hover:border-gray-100 p-3 rounded-2xl flex items-center justify-between cursor-pointer transition-all bg-slate-50/30 hover:bg-white">
+                      <div
+                        key={idx}
+                        className="group border border-rose-100/80 hover:border-rose-200 p-3.5 rounded-2xl flex items-center justify-between cursor-pointer transition-all bg-rose-50/20 hover:bg-rose-50/50"
+                      >
                         <div className="flex items-center gap-3 min-w-0">
-                          <span className="p-2 bg-slate-50 rounded-xl shrink-0">
+                          <span className="p-2 bg-white rounded-xl shadow-2xs border border-rose-100 shrink-0">
                             {getDirectiveIcon(directive.iconType)}
                           </span>
                           <div className="text-left truncate">
-                            <p className="text-xs font-extrabold text-gray-800 truncate">{directive.title}</p>
-                            <p className="text-[10px] text-gray-400 font-medium mt-0.5">{directive.description}</p>
+                            <p className="text-xs font-extrabold text-rose-950 truncate">
+                              {directive.title}
+                            </p>
+                            <p className="text-[10px] text-rose-500 font-medium mt-0.5 truncate">
+                              {directive.description}
+                            </p>
                           </div>
                         </div>
-                        <ChevronRight size={14} className="text-gray-300 group-hover:text-gray-400 transition shrink-0 ml-1" />
+                        <ChevronRight
+                          size={14}
+                          className="text-rose-300 group-hover:text-rose-500 transition shrink-0 ml-1.5"
+                        />
                       </div>
                     ))
                   )}
                 </div>
               </div>
 
-              <button className="mt-5 w-full bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white font-bold py-3 px-4 rounded-2xl shadow-sm flex items-center justify-center gap-1.5 text-xs sm:text-sm transition shrink-0">
-                <span>View Full Analysis Report</span>
-                <ChevronRight size={14} />
+              {/* Red-Rose Gradient Action Button */}
+              <button className="mt-6 w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 active:scale-[0.98] text-white font-bold py-3 px-4 rounded-2xl shadow-md shadow-rose-500/20 flex items-center justify-center gap-2 text-xs sm:text-sm transition shrink-0">
+                <span>View Full Medical Report</span>
+                <ChevronRight size={15} />
               </button>
             </div>
 

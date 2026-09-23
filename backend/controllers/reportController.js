@@ -1,29 +1,22 @@
 const { spawn } = require("child_process");
 const path = require("path");
 const fs = require("fs");
-const Report = require("../models/Report");
+const MedicalReport = require("../models/MedicalReport");
 const Patient = require("../models/Patient");
 
-// Core Logic Handler for Frontend Endpoint: /report/analyze-report
 const uploadReport = async (req, res) => {
   try {
-    // 1. Validate Patient Profile via session user payload context
     const patient = await Patient.findOne({
       userId: req.user._id,
     });
 
     if (!patient) {
-      // Cleanup uploaded assets from disk storage to prevent memory overflow leakage
-      if (req.file && fs.existsSync(req.file.path)) {
-        fs.unlinkSync(req.file.path);
-      }
       return res.status(404).json({
         success: false,
         message: "Patient profile not found",
       });
     }
 
-    // 2. Validate Multipart File Buffer
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -32,13 +25,21 @@ const uploadReport = async (req, res) => {
     }
 
     const absoluteFilePath = path.resolve(req.file.path);
-    const pythonInterpreterPath = "C:\\Users\\User\\anaconda3\\python.exe";
-    
-    // Path points strictly to our modular AI framework module
-    const scriptPath = path.join(__dirname, "..", "ai", "report_analyzer.py");
 
-    // 3. Spawning Python child process pipeline for multi-modal context execution
-    const pythonProcess = spawn(pythonInterpreterPath, [scriptPath, absoluteFilePath]);
+    const pythonInterpreterPath =
+      "C:\\Users\\User\\anaconda3\\python.exe";
+
+    const scriptPath = path.join(
+      __dirname,
+      "..",
+      "ai",
+      "report_analyzer.py"
+    );
+
+    const pythonProcess = spawn(
+      pythonInterpreterPath,
+      [scriptPath, absoluteFilePath]
+    );
 
     let outputData = "";
     let errorData = "";
@@ -52,104 +53,165 @@ const uploadReport = async (req, res) => {
     });
 
     pythonProcess.on("close", async (code) => {
-      // Safely delete file from backend/uploads to keep storage footprint minimal
-      if (fs.existsSync(absoluteFilePath)) {
-        fs.unlinkSync(absoluteFilePath);
-      }
-
       if (code !== 0) {
-        console.error("Python Subprocess Crash Output Matrix:\n", errorData);
+        console.error("Python Error:", errorData);
+
+        if (fs.existsSync(absoluteFilePath)) {
+          fs.unlinkSync(absoluteFilePath);
+        }
+
         return res.status(500).json({
           success: false,
-          message: "AI pipeline analysis execution failure parameters.",
+          message: "AI pipeline analysis failed",
+          error: errorData,
         });
       }
 
       try {
-        const parsedAIResponse = JSON.parse(outputData.trim());
+        const parsedAIResponse = JSON.parse(
+          outputData.trim()
+        );
 
         if (!parsedAIResponse.success) {
+          if (fs.existsSync(absoluteFilePath)) {
+            fs.unlinkSync(absoluteFilePath);
+          }
+
           return res.status(500).json(parsedAIResponse);
         }
 
-        // 4. Save structured results inside MongoDB collections framework
-        const report = await Report.create({
-          patientId: patient._id,
-          reportType: req.body.reportType || parsedAIResponse.prediction || "General Lab Report",
+        const report = await MedicalReport.create({
+          patientId: patient.patientId,
+          patientName: req.user.name || "Unknown Patient",
+          uploadedBy: req.user._id,
+
+          reportType:
+            req.body.reportType ||
+            parsedAIResponse.reportType ||
+            "Other",
+
           fileUrl: req.file.path,
-          extractedText: typeof parsedAIResponse.findings === "string" 
-            ? parsedAIResponse.findings 
-            : JSON.stringify(parsedAIResponse.findings),
-          aiSummary: parsedAIResponse.followUp,
-          riskLevel: parsedAIResponse.riskLevel || "Low",
-          findings: parsedAIResponse.findings
+
+          originalFileName:
+            req.file.originalname || "",
+
+          extractedText:
+            typeof parsedAIResponse.extractedText === "string"
+              ? parsedAIResponse.extractedText
+              : typeof parsedAIResponse.findings === "string"
+              ? parsedAIResponse.findings
+              : JSON.stringify(
+                  parsedAIResponse.findings || ""
+                ),
+
+          prediction:
+            parsedAIResponse.prediction || "",
+
+          confidence:
+            parsedAIResponse.confidence || 0,
+
+          riskLevel:
+            parsedAIResponse.riskLevel || "Unknown",
+
+          findings:
+            typeof parsedAIResponse.findings === "string"
+              ? parsedAIResponse.findings
+              : JSON.stringify(
+                  parsedAIResponse.findings || ""
+                ),
+
+          recommendations:
+            Array.isArray(parsedAIResponse.recommendations)
+              ? parsedAIResponse.recommendations
+              : [],
+
+          aiSummary:
+            parsedAIResponse.aiSummary ||
+            parsedAIResponse.followUp ||
+            "",
+
+          followUp:
+            parsedAIResponse.followUp || "",
+
+          aiExplanation:
+            parsedAIResponse.aiExplanation || "",
+
+          retrievedContext:
+            parsedAIResponse.retrievedContext || "",
+
+          medicalEntities:
+            Array.isArray(parsedAIResponse.medicalEntities)
+              ? parsedAIResponse.medicalEntities
+              : [],
+
+          processingStatus: "Completed",
         });
 
-        // 5. Respond directly back syncing up state parameters with react hooks
+        if (fs.existsSync(absoluteFilePath)) {
+          fs.unlinkSync(absoluteFilePath);
+        }
+
         return res.status(200).json({
           success: true,
-          message: "Report processed and analytical data structured successfully.",
-          prediction: parsedAIResponse.prediction,
-          confidence: parsedAIResponse.confidence,
-          riskLevel: report.riskLevel,
-          findings: parsedAIResponse.findings,
-          recommendations: parsedAIResponse.recommendations,
-          followUp: parsedAIResponse.followUp,
-          reportId: report._id
-        });
+          message: "Report processed successfully",
 
-      } catch (jsonErr) {
-        console.error("JSON Evaluation Serialization Crash Context:", outputData);
+          reportId: report._id,
+
+          prediction: report.prediction,
+          confidence: report.confidence,
+          riskLevel: report.riskLevel,
+          findings: report.findings,
+          recommendations: report.recommendations,
+          followUp: report.followUp,
+          aiSummary: report.aiSummary,
+        });
+      } catch (error) {
+        console.error("Report Save Error:", error);
+        console.error("Python Output:", outputData);
+
+        if (fs.existsSync(absoluteFilePath)) {
+          fs.unlinkSync(absoluteFilePath);
+        }
+
         return res.status(500).json({
           success: false,
-          message: "Malformed output serialization stream payload received.",
+          message: "Failed to save report",
+          error: error.message,
         });
       }
     });
-
   } catch (error) {
-    // Top level backup guardrail rule to prevent process hanging
+    console.error("Report Controller Error:", error);
+
     if (req.file && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
     }
-    res.status(500).json({
+
+    return res.status(500).json({
       success: false,
       message: error.message,
     });
   }
 };
 
-// Returns chronological record stack for dashboard list tables metrics
 const getReports = async (req, res) => {
   try {
-    const patient = await Patient.findOne({
-      userId: req.user._id,
-    });
+    const reports = await MedicalReport.find({
+      uploadedBy: req.user._id,
+    }).sort({ createdAt: -1 });
 
-    if (!patient) {
-      return res.status(404).json({
-        success: false,
-        message: "Patient profile not found",
-      });
-    }
-
-    const reports = await Report.find({
-      patientId: patient._id,
-    }).sort({ createdAt: -1 }); // Sort by newest records first
-
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      reports
+      reports,
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: error.message,
     });
   }
 };
 
-// Explicit database mutations handler overrides
 const saveReportResult = async (req, res) => {
   try {
     const {
@@ -158,15 +220,24 @@ const saveReportResult = async (req, res) => {
       aiSummary,
       riskLevel,
       findings,
+      recommendations,
+      followUp,
+      aiExplanation,
     } = req.body;
 
-    const report = await Report.findByIdAndUpdate(
-      reportId,
+    const report = await MedicalReport.findOneAndUpdate(
+      {
+        _id: reportId,
+        uploadedBy: req.user._id,
+      },
       {
         extractedText,
         aiSummary,
         riskLevel,
         findings,
+        recommendations,
+        followUp,
+        aiExplanation,
       },
       {
         new: true,
@@ -176,17 +247,17 @@ const saveReportResult = async (req, res) => {
     if (!report) {
       return res.status(404).json({
         success: false,
-        message: "Report record document targets not found",
+        message: "Report not found",
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      message: "Report results updated successfully in persistent cluster layer.",
+      message: "Report results updated successfully",
       report,
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: error.message,
     });
